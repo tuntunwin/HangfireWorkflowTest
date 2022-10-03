@@ -12,18 +12,26 @@ namespace WebApplication1
             BackgroundJob.ContinueJobWith(jobId, () => CompleteExportTask(taskId));
         }
 
-        public void MoveUploadedVideoToVOD(string? taskId, string videoId) { 
+        public void MoveUploadedVideoToVOD(string? taskId, string videoId) {
+            ExceptionSimulator.Trigger("Before MoveUploadedVideoToVOD");
+
             Console.WriteLine($"Moving videos from Upload to VOD {taskId}=>{videoId}");
             redis.GetDatabase().HashSet($"export:{taskId}", "videoId", videoId);
             redis.GetDatabase().HashSet($"export:{taskId}", "status", "uploaded");
+            
+            ExceptionSimulator.Trigger("After MoveUploadedVideoToVOD");
         }
 
         public void CompleteExportTask(string? taskId)
         {
+            ExceptionSimulator.Trigger("Before CompleteExportTask");
+
             var videoId = redis.GetDatabase().HashGet($"export:{taskId}", "videoId");
             Console.WriteLine($"Complete Export Task {taskId}=>{videoId}");
             redis.GetDatabase().HashSet($"export:{taskId}", "status", "completed");
             redis.GetDatabase().KeyDelete($"export:{taskId}");
+
+            ExceptionSimulator.Trigger("After CompleteExportTask");
         }
 
     }

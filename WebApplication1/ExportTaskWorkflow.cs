@@ -19,16 +19,25 @@ namespace WebApplication1
             
         }
 
-        public void AddExportTask(string? taskId) { 
-           
+        public void AddExportTask(string? taskId) {
+            ExceptionSimulator.Trigger("Before AddExportTask");
+
             Console.WriteLine($"Saving export task record into db {taskId}");
             redis.GetDatabase().HashSet($"export:{taskId}", "status", "started");
+
+            ExceptionSimulator.Trigger("After AddExportTask");
         }
 
         public void ExecuteExportTask(string? taskId) {
+            ExceptionSimulator.Trigger("Before ExecuteExportTask");
+
             Console.WriteLine($"Call Execute Export Task API {taskId}");
             redis.GetDatabase().HashSet($"export:{taskId}", "status", "executed");
+            ExceptionSimulator.Trigger("After ExecuteExportTask");
+
             new UploadTaskWorkflow(this.redis).Run(taskId);
+
+            
         }
        
     }

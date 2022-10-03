@@ -33,5 +33,11 @@ app.UseAuthorization();
 app.MapControllers();
 app.UseHangfireDashboard();
 
-new ExportTaskWorkflow(redis).Run("BBB");
+GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 5, DelaysInSeconds = new int[] { 1 } });
+//if (args.Length > 0) {
+//var taskId = args[0];
+var taskId = "DDD";
+    new ExportTaskWorkflow(redis).Run(taskId);
+//}
+
 app.Run();
